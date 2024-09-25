@@ -9,10 +9,11 @@ from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 from dotenv import load_dotenv
 from app import *
+from app.database import TORTOISE_ORM
 from pydantic import BaseModel
-from app.schemas.api_response import ApiResponse
+from app.api_response import ApiResponse
 from app.middlewares import add_process_time_header
-from app.utils.jwt_auth import get_user
+from app.utils.jwt_auth import authentication
 from app.api import router
 
 
@@ -38,7 +39,7 @@ class CustomAPIRouter(APIRouter):
 
 app = FastAPI(
     debug=True if os.getenv("RUNNING_MODE") == "dev" else False,
-    dependencies=[Depends(get_user)],
+    dependencies=[Depends(authentication)],
     lifespan=lifespan,
     docs_url=f"{prefix}/docs",
 )
@@ -67,7 +68,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-coustom_router = CustomAPIRouter(prefix="/sims")
+coustom_router = CustomAPIRouter(prefix=prefix)
 
 
 app.include_router(coustom_router)

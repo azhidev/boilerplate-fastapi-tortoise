@@ -6,6 +6,7 @@ from tortoise import fields, models
 class User(models.Model):
     id = fields.CharField(pk=True, max_length=50)
     username = fields.CharField(max_length=50)
+    age = fields.IntField(null=True)
     
     class Meta:
         table = "users"

@@ -1,12 +1,12 @@
 init:
-	aerich init -t config.db.TORTOISE_ORM
+	aerich init -t app.config.db.TORTOISE_ORM
 	aerich init-db
+
+migration:
+	aerich migrate
 
 migrate:
 	aerich upgrade
-
-makemigrations:
-	aerich migrate
 
 clean:
 	rm -rf migrations

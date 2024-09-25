@@ -5,8 +5,7 @@ from fastapi import Header, Request
 from fastapi.exceptions import HTTPException
 from starlette.datastructures import MutableHeaders
 from dotenv import load_dotenv
-from app.models.user import User
-
+from app.models import User
 load_dotenv()
 
 SECRET_KEY = os.getenv("SECRET_KEY")
@@ -24,7 +23,8 @@ def decode_jwt(token):
 def generate_id(size=10):
     return generate(size=size)
 
-def get_user(request: Request, HTTP_AUTHORIZATION:str = Header("Bearer token")):
+def authentication(request: Request, HTTP_AUTHORIZATION:str = Header("Bearer token")):
+    print(request.url, "==========================")
     if (request.url._url.split(prefix)[1] if prefix else request.url.path) not in ["/", "/v1/users/login", "/docs", "/redoc", "/openapi.json"]:
         if os.getenv('RUNNING_MODE') == "dev" and HTTP_AUTHORIZATION.replace("Bearer ", "") == os.getenv("DEV_JWT"):
             jwt_opened = {"username":os.getenv("DEV_USERNAME"), "expire":(time.time() + int(os.getenv("JWT_EXPIRE_TIME")))}
