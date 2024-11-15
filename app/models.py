@@ -1,12 +1,15 @@
 from tortoise import fields, models
+from datetime import datetime, timezone
+from typing import List
 
 # from tortoise.contrib.pydantic import pydantic_model_creator
 
 
 class User(models.Model):
     id = fields.CharField(pk=True, max_length=50)
-    username = fields.CharField(max_length=50)
-    
+    username = fields.CharField(max_length=50, unique=True)
+    password = fields.CharField(max_length=200)
+
     class Meta:
         table = "users"
 
@@ -31,8 +34,6 @@ class UserPermissions(models.Model):
 
     class Meta:
         table = "user_permissions"
-
-
 
 # class Operation(models.Model):
 #     id = fields.CharField(pk=True, max_length=50)

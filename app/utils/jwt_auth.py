@@ -6,10 +6,13 @@ from fastapi.exceptions import HTTPException
 from starlette.datastructures import MutableHeaders
 from dotenv import load_dotenv
 from app.models import User
+from passlib.context import CryptContext
+
 load_dotenv()
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 prefix="" if os.getenv("RUNNING_MODE")=="dev" else f'/{os.getenv("PREFIX")}'
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def jwt_generator(username):
     return jwt.encode({"username":username, "expire":(time.time() + os.getenv("JWT_EXPIRE_TIME"))}, SECRET_KEY, algorithm="HS256")
@@ -26,7 +29,7 @@ def generate_id(size=10):
 def authentication(request: Request, HTTP_AUTHORIZATION:str = Header("Bearer token")):
     if (request.url._url.split(prefix)[1] if prefix else request.url.path) not in ["/", "/v1/users/login", "/docs", "/redoc", "/openapi.json"]:
         if os.getenv('RUNNING_MODE') == "dev" and HTTP_AUTHORIZATION.replace("Bearer ", "") == os.getenv("DEV_JWT"):
-            jwt_opened = {"username":os.getenv("DEV_USERNAME"), "expire":(time.time() + int(os.getenv("JWT_EXPIRE_TIME")))}
+            jwt_opened = {"username":os.getenv("DEV_USERNAME"), "exp":(time.time() + int(os.getenv("JWT_EXPIRE_TIME")))}
         else:
             try:
                 jwt_opened = decode_jwt(HTTP_AUTHORIZATION.replace("Bearer ", ""))
@@ -35,7 +38,7 @@ def authentication(request: Request, HTTP_AUTHORIZATION:str = Header("Bearer tok
                     jwt_opened = decode_jwt(request.headers["authorization"].replace("Bearer ", ""))
                 except:
                     raise HTTPException(401, detail="not authenticate")
-            if jwt_opened["expire"] < time.time():
+            if jwt_opened["exp"] < time.time():
                 raise HTTPException(401, detail="token is expire")
         # if "user_id" not in jwt_opened:
         #     raise HTTPException(401, detail="jwt does not have user_id")
