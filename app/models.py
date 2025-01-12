@@ -8,7 +8,8 @@ from typing import List
 class User(models.Model):
     id = fields.CharField(pk=True, max_length=50)
     username = fields.CharField(max_length=50, unique=True)
-    password = fields.CharField(max_length=200)
+    hashed_password = fields.CharField(max_length=200)
+    
 
     class Meta:
         table = "users"

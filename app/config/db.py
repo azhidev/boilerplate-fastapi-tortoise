@@ -3,7 +3,8 @@ from dotenv import load_dotenv
 import os
 load_dotenv()
 
-SQL_URL = os.getenv("SQL_URL")
+SQL_URL = os.getenv("SQL_URL") # postgres://postgres:sfadfsadfsafsd@mywebapp.com:38716
+# print(SQL_URL, "*"*100)
 
 TORTOISE_ORM = {
     "connections": {

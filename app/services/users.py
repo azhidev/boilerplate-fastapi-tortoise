@@ -41,7 +41,7 @@ class UserService(BaseService[User, UserCreate]):
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
         # Check if the provided password matches the stored hashed password
-        if not self.verify_password(user_data.password, user.password):
+        if not self.verify_password(user_data.password, user.hashed_password):
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect password")
 
         # Generate and return a JWT token

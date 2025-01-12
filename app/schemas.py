@@ -24,7 +24,7 @@ class UserRead(BaseModel):
     username: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class Token(BaseModel):
@@ -71,13 +71,19 @@ class BaseService(Generic[T, C]):
         """Create a new instance with password hashing, error handling, and unique constraint handling."""
         try:
             custom_id = self.generate_ulid()
-            create_dict = create_data.model_dump()
+
+            # Convert the Pydantic model to a dictionary
+            create_dict = create_data.model_dump()  # Use .dict() to get a dictionary representation
 
             # Check if the 'password' field exists and hash it
             if "password" in create_dict:
-                create_dict["password"] = self.hash_password(create_dict["password"])
+                create_dict["hashed_password"] = self.hash_password(create_dict["password"])
+                del create_dict["password"]  # Remove the 'password' key after hashing
 
             create_dict["id"] = custom_id  # Add generated ID to the data
+
+            # Assuming `self.model.create()` expects keyword arguments
+            # return await self.model.create(**create_dict)
             return await self.model.create(**create_dict)
 
         except IntegrityError as e:
